@@ -2,9 +2,9 @@
 
 # -- Project information
 
-project = 'Lumache'
-copyright = '2021, Graziella'
-author = 'Graziella'
+project = 'C en resumen'
+copyright = '2023, UPM'
+author = 'Santiago Tapia-Fernández'
 
 release = '0.1'
 version = '0.1.0'
