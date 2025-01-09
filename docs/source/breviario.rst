@@ -23,7 +23,7 @@ Breviario de Lenguaje C
          >= <#operaciones-de-comparación------>`__
       -  `Operaciones de bit: & (y bitwise) \| (ó bitwise) ^ (xor
          bitwise) ~ (negación bitwise) << >>
-         (desplazamientos) <#operaciones-de-bit--y-bitwise--ó-bitwise--xor-bitwise--negación-bitwise---desplazamientos>`__
+         (desplazamientos)<#operaciones-de-bit--y-bitwise--ó-bitwise--xor-bitwise--negación-bitwise---desplazamientos>`__
       -  `Uso del paréntesis ( ) <#uso-del-paréntesis-->`__
       -  `Asignación = <#asignación->`__
       -  `Asignación combinada: += -= \*= /= %= &= \|=
@@ -93,6 +93,7 @@ Breviario de Lenguaje C
       -  `Alternativa a un array 2D como un vector de
          punteros <#alternativa-a-un-array-2d-como-un-vector-de-punteros>`__
 
+   -  `Funciones para manipulación de datos en binario<#funciones-sobre-buffers>`__
    -  `struct (TBD) <#struct-tbd>`__
 
 Datos y Tipos de Datos
@@ -351,7 +352,7 @@ Sintaxis if
 
 ::
 
-   if (cond) sentencia1 
+   if (cond) sentencia1
    [ else sentencia2 ]
 
 -  Cuando se anidan el ``else`` se asocia al ``if`` más cercano que sea
@@ -362,11 +363,11 @@ Sintaxis switch
 
 ::
 
-   switch ( entero ) 
+   switch ( entero )
    {
-       case CTE_LITERAL1 : 
+       case CTE_LITERAL1 :
            break;
-       case CTE_LITERAL2 : 
+       case CTE_LITERAL2 :
            break;
        default:
            break;
@@ -1066,11 +1067,11 @@ pasos):
 
 ::
 
-   void *p = malloc(35*sizeof(int)); 
+   void *p = malloc(35*sizeof(int));
    /* También: void *p = calloc(7, sizeof(int[5])); */
    int (*array)[5] = p;
    array[2][3] = 33;
-   /* [...] */ 
+   /* [...] */
    free(array);
 
 Alternativa a un array 2D como un vector de punteros
@@ -1098,6 +1099,133 @@ Para la misma matriz, ``int array2d[7][5]``, se hace:
      free(array[i]); /* Se Libera las filas */
    }
    free(array); /* Se libera el vector de punteros */
+
+
+Funciones para manipulación de datos en binario
+------------------------------------------------
+
+En esta sección se explican las funciones: memcpy, fread y fwrite.
+
+Todas ellas están relacionadas porque operan sobre datos binarios sin interpretar de ninguna manera su contenido.
+
+* ``memcpy`` copia datos de una zona de memoria a otra.
+* ``fread`` copia datos de un archivo a una zona de memoria.
+* ``fwrite`` copia datos de una zona de memoria a un archivo.
+
+Cambia el origen y el destino de la información, pero el fondo es el mismo.
+
+Una `zona de memoria` se corresponde con un objeto (en sentido C), es decir, una variable estática o dinámica.
+La `zona de memoria` se define mediante la dirección de memoria del primer byte que ocupa (un puntero void*) y su tamaño en bytes.
+
+Las siguientes expresiones son formas válidas de definir `zonas de memoria`, se indica con un comentario la expresión para el puntero y la expresión para el tamaño, y, previamente se hacen las declaraciones necesarias:
+
+::
+
+   int numero;
+   &numero; /* Puntero */
+   sizeof(numero); /* tamaño */
+
+   double vector[10];
+   vector; /* Puntero */
+   sizeof(vector); /* tamaño, también: 10*sizeof(double) */
+
+   short *v_dyn = calloc(10, sizeof(short));
+   v_dyn; /* Puntero */
+   10*sizeof(short) /* tamaño */
+
+   typedef struct { int num; char bytes[4]; } mi_struct;
+   mi_struct datos;
+   &datos; /* Puntero */
+   sizeof(mi_struct) /* tamaño, también: sizeof(datos) */
+
+Estas zonas de memoria que se manipulan sin conocer qué tipo de información tienen suelen recibir el nombre de `bufferes`.
+
+Es común usar este nombre para un array de bytes cuyo uso no va a ser una cadena alfanumérica sino, simplemente, una zona de memoria para usar como medio de trasvase de información. Por ejemplo:
+
+::
+
+   char buffer[128];
+   buffer; /* Puntero */
+   128*sizeof(char) /* tamaño, también 128 porque sizeof(char) es 1 */
+
+
+Uso de las funciones fread y fwrite
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Para usar las funciones fread y fwrite necesitamos un archivo ya abierto.
+Al usar fread y fwrite se suele especificar que la lectura o escritura es en binario.
+Es decir el archivo se abre con:
+
+::
+
+   FILE *f_leer = fopen(filename, "rb"); /* Para leer, fread */
+   FILE *f_escribir = fopen(filename, "wb"); /* Para escribir, fwrite */
+
+Y se cierra como se hace usualmente.
+
+Las declaraciones son:
+
+::
+   size_t fread(void *buffer, size_t size, size_t count, FILE *stream);
+   size_t fwrite(const void* buffer, size_t size, size_t count, FILE* stream);
+
+Como se puede ver en las declaraciones está previsto leer o escribir arrays de un tipo base cuyo tamaño viene dado por el parámentro ``size``. Cuando se quiera leer una única variable y no un array simplemente se pasa un valor ``1`` a ``count``.
+
+Para leer desde archivo necesitamos la `zona de memoria` en donde se va a guardar la información de archivo. Respectivamente para escribir, necesitamos la `zona de memoria` cuya información se guarda en archivo.
+
+Si usamos las expresiones anteriores y suponemos que tenemos los archivos abiertos como se ha hecho anteriormente, queda de la siguiente manera:
+
+::
+
+   int numero;
+   fread(&numero, sizeof(int), 1, f_leer);
+   fwrite(&numero, sizeof(int), 1, f_escribir);
+
+   double vector[10];
+   fread(vector, sizeof(double), 10, f_leer);
+   fwrite(vector, sizeof(double), 10, f_escribir);
+
+   short *v_dyn = calloc(10, sizeof(short));
+   fread(v_dyn, sizeof(short), 10, f_leer);
+   fwrite(v_dyn, sizeof(short), 10, f_escribir);
+
+   typedef struct { int num; char bytes[4]; } mi_struct;
+   mi_struct datos;
+   fread(&datos, sizeof(mi_struct), 1, f_leer);
+   fwrite(&datos, sizeof(mi_struct), 11, f_escribir);
+
+Uso de la función memcpy
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Para usar la función memcpy necesitados dos zonas de memoria, una origen y otra destino. Los datos se van a copiar del origen al destino.
+Las dos zonas de memoria deben de tener el **mismo tamaño** o, al menos, la de destino tiene que tener un tamaño **mayor**.
+
+La declaración es:
+
+::
+
+   void *memcpy(void *dest, const void *src, size_t n);
+
+Como ``dest`` y ``src`` se pueden usar expresiones como las indicadas anteriormente. Por ejemplo:
+
+::
+
+   typedef struct { char bytes[4]; int num; } mi_struct;
+   mi_struct datos;
+   char *buffer;
+   datos.num = 258;
+   datos.bytes[0] = 65;
+   /* [...] Se asigna valor al resto de los campos de la estructura datos */
+   buffer = malloc(sizeof(datos)); /* Para que tenga el mismo tamaño */
+   memcpy(buffer, &datos, sizeof(datos)); /* Copia los datos de la estructura en el buffer */
+
+Después de memcpy el valor de buffer[0] debe ser 65, buffer[4] y buffer[5] debe ser 2 y 1 respectivamente porque 258 es 1*2^8+2 y la representación está en `little endianess` el número se escribe empezando en las potencias menos significativas.
+
+:: .. warning::
+
+   Si el tamaño de int no es 4, puede ocurrir que C introduzca `padding` en la estructura y entonces habría un hueco de 4 bytes adicionales entre el campo ``bytes`` y el campo ``num``.
+   Esto se debe a que C `alinea` los datos en las estructuras para que se coloquen en posiciones de memoria que sean múltiplos de potencias de 2 muy concretas.
+
 
 struct (TBD)
 ------------
