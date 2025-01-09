@@ -89,11 +89,14 @@ Breviario de Lenguaje C
    -  `Memoria dinámica (arrays 1D) <#memoria-dinámica-arrays-1d>`__
    -  `Memoria dinámica (arrays 2D) <#memoria-dinámica-arrays-2d>`__
 
-      -  `Equivalente a un array 2D <#equivalente-a-un-array-2d>`__
-      -  `Alternativa a un array 2D como un vector de
-         punteros <#alternativa-a-un-array-2d-como-un-vector-de-punteros>`__
+      -  `Uso de la función memcpy<#uso-memcpy>`__
+      -  `Uso de las funciones fread y fwrite<#uso-fread-fwrite>`__
 
    -  `Funciones para manipulación de datos en binario<#funciones-sobre-buffers>`__
+
+      -  `Equivalente a un array 2D <#equivalente-a-un-array-2d>`__
+      -  `Equivalente a un array 2D <#equivalente-a-un-array-2d>`__
+
    -  `struct (TBD) <#struct-tbd>`__
 
 Datos y Tipos de Datos
@@ -1150,7 +1153,7 @@ Es común usar este nombre para un array de bytes cuyo uso no va a ser una caden
 
 
 Uso de las funciones fread y fwrite
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Para usar las funciones fread y fwrite necesitamos un archivo ya abierto.
 Al usar fread y fwrite se suele especificar que la lectura o escritura es en binario.
@@ -1195,7 +1198,7 @@ Si usamos las expresiones anteriores y suponemos que tenemos los archivos abiert
    fwrite(&datos, sizeof(mi_struct), 11, f_escribir);
 
 Uso de la función memcpy
-^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Para usar la función memcpy necesitados dos zonas de memoria, una origen y otra destino. Los datos se van a copiar del origen al destino.
 Las dos zonas de memoria deben de tener el **mismo tamaño** o, al menos, la de destino tiene que tener un tamaño **mayor**.
