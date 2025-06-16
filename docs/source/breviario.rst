@@ -932,15 +932,17 @@ Vamos a considerar el siguiente código fuente:
 
 ::
 
-   int array[][2] = { 11, 22 }, { 33, 44 }, { 55, 66 };
-   printf("%d", (array+1)[0]);
+   int array[][2] = {{ 11, 22 }, { 33, 44 }, { 55, 66 }};
+   printf("%d", (*(array+1))[0]);
 
 1. El ``array`` se convierte en un puntero a una *fila* compuesta de dos
    número enteros.
 2. Al sumar 1 se desplaza una fila en memoria, es decir, se desplaza 2
    enteros porque esa fila está formada por 2 enteros. Y el puntero
-   apunta a la fila (al primer elemento de la fila, el 33).
-3. Al hacer [0] obtenemos 33, el primer elemento de esa fila.
+   apunta a la fila.
+3. Al aplicar el * (operador indirección) obtenemos la fila.
+
+4. Al hacer [0] obtenemos 33, el primer elemento de esa fila.
 
 Arrays de punteros y punteros a arrays
 --------------------------------------
